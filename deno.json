@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.Iterable",
+      "dom.asynciterable",
+      "deno.ns",
+      "deno.unstable"
+    ],
+    "strict": true,
+    "target": "esnext"
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"],
+      "include": ["src/"]
+    }
+  },
+  "fmt": {
+    "files": {
+      "include": ["src/"]
+    },
+    "options": {
+      "singleQuote": true
+    }
+  }
+}

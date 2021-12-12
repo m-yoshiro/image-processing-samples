@@ -1,11 +1,19 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "prettier.eslintIntegration": true,
+  "editor.defaultFormatter": "denoland.vscode-deno",
   "editor.formatOnSave": true,
   "css.validate": false,
   "less.validate": false,
-  "scss.validate": false
+  "scss.validate": false,
+  "deno.enable": true,
+  "deno.lint": true,
+  "deno.unstable": true,
+  "deno.suggest.imports.hosts": {
+    "https://deno.land": true
+  },
+  "deno.config": "deno.json",
+  "deno.codeLens.referencesAllFunctions": true,
+  "deno.codeLens.references": true,
+  "deno.codeLens.implementations": true,
+  "deno.suggest.completeFunctionCalls": true,
+  "deno.path": "/opt/homebrew/bin/deno"
 }
