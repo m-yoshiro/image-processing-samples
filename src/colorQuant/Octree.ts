@@ -1,5 +1,4 @@
 import { OctreeNode } from './OctreeNode.ts';
-import { getColorIndexForDepth } from './utils.ts';
 import { RGB } from './Color.ts';
 
 export class OctreeQuantizer {
