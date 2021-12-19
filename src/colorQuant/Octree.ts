@@ -1,5 +1,5 @@
 import { OctreeNode } from './OctreeNode.ts';
-import { getColorIndexForDepth, getPaletteIndexFromRGB } from './utils.ts';
+import { getColorIndexForDepth } from './utils.ts';
 import { RGB } from './Color.ts';
 
 export class OctreeQuantizer {
@@ -23,7 +23,7 @@ export class OctreeQuantizer {
     this.root = new OctreeNode({ r: 0, g: 0, b: 0 }, 0, this._maxDepth);
   }
 
-  quantize(pixels: Uint8ClampedArray, option = {}) {
+  quantize(pixels: Uint8ClampedArray) {
     this.createInnerNodes(pixels);
   }
 
@@ -37,6 +37,14 @@ export class OctreeQuantizer {
 
       this.root.createChildRecursive(value);
     }
+  }
+
+  getLeaves(): OctreeNode[] {
+    return this.root.getLeaves();
+  }
+
+  getNodesbyLevel(depth: number): OctreeNode[] {
+    return this._levels[depth];
   }
 
   /** remove children at given depth */
@@ -55,14 +63,6 @@ export class OctreeQuantizer {
     this._levels[depth + 1] = [];
   }
 
-  getLeaves(): OctreeNode[] {
-    return this.root.getLeaves();
-  }
-
-  getNodesbyLevel(depth: number): OctreeNode[] {
-    return this._levels[depth];
-  }
-
   palette() {
     const palette = new Map<number, RGB>();
 
@@ -73,25 +73,5 @@ export class OctreeQuantizer {
     });
 
     return palette;
-  }
-
-  getNearestNodeByColor(value: RGB, depth: number) {
-    if (depth < 2 || depth >= this._maxDepth) {
-      throw new Error('depth must be < 2, and > maxDepth');
-    }
-
-    let currentDepth = 0;
-    let node: OctreeNode = this.root;
-
-    while (currentDepth <= depth) {
-      const index = getColorIndexForDepth(value, depth);
-      const child = node.children[index];
-      if (child) {
-        node = child;
-      }
-      currentDepth++;
-    }
-
-    return node;
   }
 }

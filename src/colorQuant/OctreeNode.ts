@@ -5,19 +5,13 @@ import {
   normalizeColor,
 } from './utils.ts';
 
-enum octreeNodeType {
-  LEAF_NODE,
-  BRANCH_NODE,
-}
-
 export class OctreeNode {
-  /** center values */
-  public value: RGB;
+  value: RGB;
 
   /** number of samples in this Node. This is required to use it as the key that orders the cells in the priority queue. */
   refCount: number;
 
-  /** Index of Color table entry */
+  /** index of palette to search for a mapped color */
   paletteIndex: number;
 
   /** 0 - 5 */
@@ -43,7 +37,7 @@ export class OctreeNode {
     this.children = new Array(8);
 
     if (this.depth < 0 || this.depth > this.maxDepth) {
-      throw new Error('depth must be [0 - maxDepth].');
+      throw new Error('depth must be {0...maxDepth}.');
     }
 
     if (this.depth === this.maxDepth && this.refCount === 0) {
@@ -58,12 +52,16 @@ export class OctreeNode {
     this.paletteIndex = getPaletteIndexFromRGB(value, this.depth);
   }
 
-  count(num: number = 1): void {
-    this.refCount += num;
-  }
-
   get isLeaf(): boolean {
     return this.refCount > 0;
+  }
+
+  /**
+   * increment refCount
+   * @param num number of count
+   */
+  count(num: number = 1): void {
+    this.refCount += num;
   }
 
   sum(value: RGB): void {
@@ -118,35 +116,6 @@ export class OctreeNode {
     return !!this.children[index];
   }
 
-  /** for debug */
-  getChildWithDepth(value: RGB, depth: number): OctreeNode | null {
-    if (depth > this.maxDepth) {
-      throw new Error('noooooo');
-    }
-
-    if (depth <= this.depth) {
-      throw new Error('Sorry, can not traverse to the parent level');
-    }
-
-    let currentDepth = this.depth;
-    let currentNode: OctreeNode = this;
-    let child: OctreeNode | null = null;
-
-    while (currentDepth <= depth) {
-      const index = getColorIndexForDepth(value, currentDepth);
-      child = currentNode.children[index];
-      currentDepth++;
-
-      if (child) {
-        currentNode = child;
-      } else {
-        continue;
-      }
-    }
-
-    return child;
-  }
-
   getLeaves(): OctreeNode[] {
     let result: OctreeNode[] = [];
 
@@ -199,5 +168,35 @@ export class OctreeNode {
     this.sum(child.value);
 
     this.children[childIndex] = null;
+  }
+
+  /** for debug only */
+  getChildWithDepth(value: RGB, depth: number): OctreeNode | null {
+    if (depth > this.maxDepth) {
+      throw new Error('depth should be lower than maxDepth.');
+    }
+
+    if (depth <= this.depth) {
+      throw new Error('Sorry, can not traverse to the parent level.');
+    }
+
+    let currentDepth = this.depth;
+    // deno-lint-ignore no-this-alias
+    let currentNode: OctreeNode = this;
+    let child: OctreeNode | null = null;
+
+    while (currentDepth <= depth) {
+      const index = getColorIndexForDepth(value, currentDepth);
+      child = currentNode.children[index];
+      currentDepth++;
+
+      if (child) {
+        currentNode = child;
+      } else {
+        continue;
+      }
+    }
+
+    return child;
   }
 }
