@@ -80,24 +80,58 @@ Deno.test('_getLeaves', () => {
 });
 
 Deno.test('_palette', async () => {
-  const quantizer = new OctreeQuantizer(2);
   const img = await Deno.readFile(join(basePath, 'sample.png'));
+  const rawImageData = await Image.decode(img);
+  const bitmap = rawImageData.bitmap;
+  const quantizer = new OctreeQuantizer(2);
 
+  quantizer.quantize(bitmap);
+  const palette = quantizer.palette();
+
+  assert(palette.size > 0);
+  // TODO: write test codes more
+});
+
+Deno.test('Quantizer.quantize', () => {
+  const quantizer = new OctreeQuantizer();
+  quantizer.quantize(pixels);
+
+  // only maxLevel nodes have refCount over 0.
+  assert(quantizer._levels[1].every((node) => node.refCount === 0));
+  assert(quantizer._levels[2].every((node) => node.refCount === 0));
+  assert(quantizer._levels[3].every((node) => node.refCount === 0));
+  assert(quantizer._levels[4].some((node) => node.refCount > 0));
+
+  // Throw error
+  assertThrows(() => quantizer.removeLeavesAt(1), Error);
+  assertThrows(() => quantizer.removeLeavesAt(6), Error);
+});
+
+Deno.test('all process', async () => {
+  const MAX_DEPTH = 2;
+  const img = await Deno.readFile(join(basePath, 'sample.png'));
   const rawImageData = await Image.decode(img);
   const bitmap = rawImageData.bitmap;
   const resultBitmap = new Uint8ClampedArray(bitmap.length);
-
-  quantizer.quantize(bitmap);
-
-  const palette = quantizer.palette();
-
   let errs = [];
 
+  // ===============================
+  // Start
+
+  // Initialize Octree.
+  const quantizer = new OctreeQuantizer(MAX_DEPTH);
+
+  // 1. make Octree using bitmap
+  quantizer.quantize(bitmap);
+
+  // 2. make palette from Octree made before
+  const palette = quantizer.palette();
+
+  // 3. generate new pixels by mapping with palette color
   for (let i = 0; i < bitmap.length; i += 4) {
-    bitmap;
     const paletteIndex = getPaletteIndexFromRGB(
       { r: bitmap[i], g: bitmap[i + 1], b: bitmap[i + 2] },
-      2,
+      MAX_DEPTH,
     );
 
     const color = palette.get(paletteIndex);
@@ -118,28 +152,12 @@ Deno.test('_palette', async () => {
       }]);
     }
   }
-
   assertEquals(errs.length, 0, errs.toString());
 
   rawImageData.bitmap.set(resultBitmap);
   const encoded = await rawImageData.encode(1);
   await Deno.writeFile(
-    join(basePath, 'dist', 'output.png'),
+    join(basePath, 'dist', `output-depth${MAX_DEPTH}.png`),
     encoded,
   );
-});
-
-Deno.test('Quantizer.quantize', () => {
-  const quantizer = new OctreeQuantizer();
-  quantizer.quantize(pixels);
-
-  // only maxLevel nodes have refCount over 0.
-  assert(quantizer._levels[1].every((node) => node.refCount === 0));
-  assert(quantizer._levels[2].every((node) => node.refCount === 0));
-  assert(quantizer._levels[3].every((node) => node.refCount === 0));
-  assert(quantizer._levels[4].some((node) => node.refCount > 0));
-
-  // Throw error
-  assertThrows(() => quantizer.removeLeavesAt(1), Error);
-  assertThrows(() => quantizer.removeLeavesAt(6), Error);
 });

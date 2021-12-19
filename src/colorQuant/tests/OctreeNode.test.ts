@@ -2,22 +2,18 @@ import {
   assert,
   assertEquals,
   assertExists,
-  assertNotEquals,
   assertObjectMatch,
   assertThrows,
 } from 'https://deno.land/std/testing/asserts.ts';
 import { OctreeNode } from '../OctreeNode.ts';
 import { RGB } from '../Color.ts';
-import { getColorIndexForDepth } from '../utils.ts';
 
 const value: RGB = {
   r: 118, // 0b01110110
   g: 100, // 0b01100100
   b: 38, //  0b00100110
 };
-const expectedIndecies = [0, 6, 7, 4, 0, 7];
 
-// 5, 4, 1, 5, 2, 1, 6, 4
 const value2: RGB = {
   r: 211, // 0b11010011
   g: 10, //  0b00001010
@@ -41,7 +37,6 @@ Deno.test('_createChildRecursive', () => {
   const rootNode = new OctreeNode(value, 0, 5);
   rootNode.createChildRecursive(value);
 
-  // const node2 = new OctreeNode({ r: 35, g: 38, b: 47 }, 0, 5);
   const node2 = new OctreeNode({ r: 37, g: 37, b: 45 }, 0, 5);
   node2.createChildRecursive({ r: 35, g: 38, b: 47 });
   node2.createChildRecursive({ r: 37, g: 37, b: 45 });
@@ -106,7 +101,7 @@ Deno.test('_getChildWithDepth', () => {
       node.getChildWithDepth(value, 6);
     },
     Error,
-    'nooooo',
+    'depth should be lower than maxDepth.',
   );
 
   for (let i = 1; i < 5; i++) {
