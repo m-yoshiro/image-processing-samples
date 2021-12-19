@@ -2,8 +2,8 @@
 
 ## Octree
 
-⚠️ This code I made has some issues. Some colors are too difference from the
-original image.
+⚠️ This code has some issues. Some colors are too difference from the original
+image.
 
 | depth 5                                | depth 4                                | depth 3                                | depth 2                                |
 | -------------------------------------- | -------------------------------------- | -------------------------------------- | -------------------------------------- |
