@@ -9,7 +9,7 @@ original image.
 | -------------------------------------- | -------------------------------------- | -------------------------------------- | -------------------------------------- |
 | ![depth 5](./sample/output-depth5.png) | ![depth 4](./sample/output-depth4.png) | ![depth 3](./sample/output-depth3.png) | ![depth 2](./sample/output-depth2.png) |
 
-## References
+### References
 
 https://en.wikipedia.org/wiki/Octree <br>
 https://observablehq.com/@tmcw/octree-color-quantization <br>
